@@ -1,8 +1,20 @@
 using LinearAlgebra
 using OffsetArrays
+using JuMP, GLPK
+
+#=
+Remarks: for convenience we use integer weights and values
+for Dynamic Programming only the weights have to be integer
+for Integer Programming there are no restrictions
+=#
+
+
+#==============================================================
+===========   EXACT SOLUTIONS =================================
+==============================================================#
 
 "Computes a solution for the 0/1 Knapsack problem using dynamic programming."
-function dp_knapsack(weights::Vector{Int}, values::Vector{Int}, maxWeight::Int)::Set{Int}
+function knapsack_dp(weights::Vector{Int}, values::Vector{Int}, maxWeight::Int)::Set{Int}
 	# dividing all weights and maxWeight by their greatest common divisor does
 	# not change the solution, yet can drastically reduce the size of the val_matrix
 	my_gcd = gcd(gcd(weights), maxWeight)
@@ -53,3 +65,31 @@ function dp_knapsack(weights::Vector{Int}, values::Vector{Int}, maxWeight::Int):
 	# display(val_matrix)
 	return retrieve_solution(n, maxWeight)
 end
+
+"Computes a solution for the 0/1 Knapsack problem using Integer Programming."
+function knapsack_ip(weights::Vector{Int}, values::Vector{Int}, maxWeight::Int)::Set{Int}
+	n = length(weights)
+	if n != length(values)
+		error("The lengths of weights and values don't match!")
+	end
+	model = Model(GLPK.Optimizer)
+	@variable(model, x[1:n], Bin)
+	@constraint(model, x ⋅ weights <= maxWeight)
+	@objective(model, Max, x ⋅ values)
+	optimize!(model)
+	bin_sol = value.(x)
+	solution = Set()
+	for i in 1:n
+		if bin_sol[i] == 1
+			push!(solution, i)
+		end
+	end
+	return solution
+end
+
+#==============================================================
+===========   APPROXIMATION SCHEMES    ========================
+==============================================================#
+
+
+
