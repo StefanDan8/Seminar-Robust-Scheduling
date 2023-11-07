@@ -66,6 +66,8 @@ function knapsack_dp(weights::Vector{Int}, values::Vector{Int}, maxWeight::Int):
 	return retrieve_solution(n, maxWeight)
 end
 
+# an IP exact solution should avoid StackOverflow problems for many objects
+# it also poses no restrictions regarding the types of weights.
 "Computes a solution for the 0/1 Knapsack problem using Integer Programming."
 function knapsack_ip(weights::Vector{Int}, values::Vector{Int}, maxWeight::Int)::Set{Int}
 	n = length(weights)
