@@ -22,28 +22,31 @@ Returns a permutation of the jobs' indices.
 # end
 
 """
-	doubling(::SchedulingInstance)
+	doubling(::SchedulingInstance, ::Function)
 
 Compute a universal 4-robust schedule for the given set of jobs, passed through
-a `SchedulingInstance`.
+a `SchedulingInstance`. The knapsack routine is passed through the `kanpsack` 
+argument.
 
 A universal α-robust schedule is a schedule whose cost differs from optimality by 
 a factor of at most α, regardless of which cost function is used.
 
 Returns a permutation of the jobs' indices.
 """
-function doubling(instance::SchedulingInstance)::Vector{Int}
+function doubling(instance::SchedulingInstance, knapsack::Function)::Vector{Int}
 	pi = Int[]
 	total_weight = sum(instance.weights)
 	for i in 0:ceil(log2(total_weight))
-		J = dp_knapsack(instance.weights, instance.processing_times, round(Int, 2^i))
+		J = knapsack(instance.weights, instance.processing_times, round(Int, 2^i))
 		for index in J
 			if ~(index in pi)
-				pushfirst!(pi, index)
+				# here order is arbitrary within the same J, so instead of 
+				# prepending, one can append and then reverse.
+				push!(pi, index)
 			end
 		end
 	end
-	return pi
+	return reverse(pi)
 end
 
 "Computes a permutation of jobs' indices based on Smith's Rule, i.e
