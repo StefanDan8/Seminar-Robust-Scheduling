@@ -17,7 +17,7 @@ function compute_cost(instance::SchedulingInstance, schedule::Vector{Int}, f::Fu
 	cost = 0
 	for job in schedule
 		ellapsed += instance.processing_times[job]
-		cost += f(ellapsed)*instance.weights[job]
+		cost += f(ellapsed) * instance.weights[job]
 	end
 	return cost
 end
