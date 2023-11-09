@@ -69,7 +69,7 @@ end
 # an IP exact solution should avoid StackOverflow problems for many objects
 # it also poses no restrictions regarding the types of weights.
 "Computes a solution for the 0/1 Knapsack problem using Integer Programming."
-function knapsack_ip(weights::Vector{Int}, values::Vector{Int}, maxWeight::Int)::Set{Int}
+function knapsack_ip(weights::Vector, values::Vector, maxWeight::Real)::Set{Int}
 	n = length(weights)
 	if n != length(values)
 		error("The lengths of weights and values don't match!")
