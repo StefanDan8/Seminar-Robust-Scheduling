@@ -1,5 +1,6 @@
 include("general.jl")
 include("../knapsack.jl")
+using Documenter
 
 """
 	doubling(::Vector{Job})
@@ -22,7 +23,7 @@ Returns a permutation of the jobs' indices.
 # end
 
 """
-	doubling(::SchedulingInstance, ::Function)
+	doubling(instance::SchedulingInstance, knapsack::Function)
 
 Compute a universal 4-robust schedule for the given set of jobs, passed through
 a `SchedulingInstance`. The knapsack routine is passed through the `kanpsack` 
@@ -42,6 +43,42 @@ function doubling(instance::SchedulingInstance, knapsack::Function)::Vector{Int}
 			if ~(index in pi)
 				# here order is arbitrary within the same J, so instead of 
 				# prepending, one can append and then reverse.
+				push!(pi, index)
+			end
+		end
+	end
+	return reverse(pi)
+end
+
+"""
+	generalized_doubling(instance::SchedulingInstance, ρ::Real, knapsack::Function)
+
+Computes a ρ²/(ρ-1)-robust scheduling for the given set of jobs, passed through
+a `SchedulingInstance`, for `ρ` > 1. The knapsack routine is passed through the `kanpsack` 
+argument.  
+The scheduling is (1 + ρ/(ρ-1))-approximate.
+
+A universal α-robust schedule is a schedule whose cost differs from optimality by 
+a factor of at most α, regardless of which cost function is used.
+An β-approximate is a schedule whose cost for linear functions differs from 
+optimality (Smith's Rule) by a factor of at most β.
+
+Returns a permutation of the jobs' indices.
+
+Note: A knapsack solver that accepts real-valued weights must be used.
+"""
+function generalized_doubling(instance::SchedulingInstance, rho::Real, knapsack::Function)::Vector{Int}
+	if rho <=1 
+		error("rho must be bigger than 1.")
+	end
+	pi = Int[]
+	total_weight = sum(instance.weights)
+	ratio::Function = job -> instance.weights[job] / instance.processing_times[job]
+	for i in 0:ceil(log(rho, total_weight))
+		J = collect(knapsack(instance.weights, instance.processing_times, rho^i))
+		sort!(J, by = ratio)
+		for index in J
+			if ~(index in pi)
 				push!(pi, index)
 			end
 		end
