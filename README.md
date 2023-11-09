@@ -1,4 +1,9 @@
 # Gems of Discrete Optimization 2023: Robustness and Approximation for Universal Scheduling
+(Work in Progress)
+This repository contains implementations in Julia of algorithms related to 
+robust scheduling and benchmarks/examples for their use. 
+
+
 
 ## References
 
