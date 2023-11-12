@@ -1,6 +1,7 @@
 include("general.jl")
 include("../knapsack.jl")
 using Documenter
+using Random, StatsBase
 
 """
 	doubling(::Vector{Job})
@@ -68,7 +69,7 @@ Returns a permutation of the jobs' indices.
 Note: A knapsack solver that accepts real-valued weights must be used.
 """
 function generalized_doubling(instance::SchedulingInstance, rho::Real, knapsack::Function)::Vector{Int}
-	if rho <=1 
+	if rho <= 1
 		error("rho must be bigger than 1.")
 	end
 	pi = Int[]
@@ -77,6 +78,32 @@ function generalized_doubling(instance::SchedulingInstance, rho::Real, knapsack:
 	for i in 0:ceil(log(rho, total_weight))
 		J = collect(knapsack(instance.weights, instance.processing_times, rho^i))
 		sort!(J, by = ratio)
+		for index in J
+			if ~(index in pi)
+				push!(pi, index)
+			end
+		end
+	end
+	return reverse(pi)
+end
+
+"""
+	randomized_doubling(instance::SchedulingInstance, knapsack::Function, rng::AbstractRNG)
+
+Computes a schedule that is in expectation ℯ-robust, where ℯ = 2.71828182...
+is Euler's number. 
+
+Returns a permutation of the jobs' indices.
+
+Note: A knapsack solver that accepts real-valued weights must be used.
+"""
+function randomized_doubling(instance::SchedulingInstance, knapsack::Function, rng::AbstractRNG)::Vector{Int}
+	pi = Int[]
+	x = ℯ^rand(rng, 1)[1]
+	println(x)
+	total_weight = sum(instance.weights)
+	for i in 0:ceil(log(total_weight))
+		J = knapsack(instance.weights, instance.processing_times, x * ℯ^i)
 		for index in J
 			if ~(index in pi)
 				push!(pi, index)
