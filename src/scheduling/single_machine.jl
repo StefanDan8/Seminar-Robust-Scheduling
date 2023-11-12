@@ -34,6 +34,7 @@ A universal α-robust schedule is a schedule whose cost differs from optimality 
 a factor of at most α, regardless of which cost function is used.
 
 Returns a permutation of the jobs' indices.
+Reference [1]
 """
 function doubling(instance::SchedulingInstance, knapsack::Function)::Vector{Int}
 	pi = Int[]
@@ -67,6 +68,7 @@ optimality (Smith's Rule) by a factor of at most β.
 Returns a permutation of the jobs' indices.
 
 Note: A knapsack solver that accepts real-valued weights must be used.
+Reference [1]
 """
 function generalized_doubling(instance::SchedulingInstance, rho::Real, knapsack::Function)::Vector{Int}
 	if rho <= 1
@@ -96,6 +98,7 @@ is Euler's number.
 Returns a permutation of the jobs' indices.
 
 Note: A knapsack solver that accepts real-valued weights must be used.
+Reference [2]
 """
 function randomized_doubling(instance::SchedulingInstance, knapsack::Function, rng::AbstractRNG)::Vector{Int}
 	pi = Int[]
@@ -113,9 +116,15 @@ function randomized_doubling(instance::SchedulingInstance, knapsack::Function, r
 	return reverse(pi)
 end
 
-"Computes a permutation of jobs' indices based on Smith's Rule, i.e
+"""
+	smith_rule(instance::SchedulingInstance)
+
+Computes a permutation of jobs' indices based on Smith's Rule, i.e
 sorting in non-increasing order based on the ratio between weight and processing_time. \n
-Note: for linear cost functions, this scheduling is proven to be optimal"
+
+Note: for linear cost functions, this scheduling is proven to be optimal
+Reference [3]
+"""
 function smith_rule(instance::SchedulingInstance)::Vector{Int}
 	ratios = instance.weights ./ instance.processing_times
 	return sortperm(ratios, rev = true)
