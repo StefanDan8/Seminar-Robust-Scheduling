@@ -6,8 +6,8 @@ end
 
 struct SchedulingInstance
 	n::Int
-	weights::Vector{Int}
-	processing_times::Vector{Int}
+	weights::Vector{Float64}
+	processing_times::Vector{Float64}
 	SchedulingInstance(n, weights, processing_times) =
 		(n == length(weights) && n == length(processing_times)) ? new(n, weights, processing_times) : error("dimensions don't match")
 end
